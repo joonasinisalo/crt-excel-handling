@@ -17,7 +17,7 @@ Verify Products
     # Start reading values from the second row, max number needs to be provided with offset
     ${product_names}=   Read Excel Column    col_num=1    max_num=6    row_offset=1    sheet_name=Fur
 
-    # Check that we can find all the products from the web page
+    # Loop through all product names and verify they are available in the webshop page
     FOR    ${item}    IN    @{product_names}
         VerifyText           ${item}
     END
