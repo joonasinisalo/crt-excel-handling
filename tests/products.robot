@@ -1,5 +1,7 @@
 *** Settings ***
 Resource                ../resources/common.resource
+Library                 ExcelLibrary
+Library                 ../libraries/GitOperations.py
 Test Teardown           Close All Excel Documents
 Suite Setup             Setup Browser
 Suite Teardown          End Suite
