@@ -1,8 +1,6 @@
 *** Settings ***
 Library                 QWeb
-Library                 ExcelLibrary
 Library                 String
-Library                 ../libraries/GitOperations.py
 
 *** Variables ***
 ${BROWSER}              chrome
