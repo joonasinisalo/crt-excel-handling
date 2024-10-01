@@ -14,10 +14,11 @@ Load Data Line
 
     ${header_row}=	    Read Excel Row	    row_num=1    sheet_name=${sheet_name}
 
-    @{rows}=            Create List
+    ${row_dict}=        Create Dictionary
     ${row_num}=         Set Variable    ${2}
 
-    WHILE    True    limit=20
+    # COMMENT: Set the limit to what you think is the max amount of rows
+    WHILE    True    limit=200
         ${row}=	            Read Excel Row	    row_num=${row_num}    sheet_name=${sheet_name}
         Log To Console      ${row}
 
@@ -38,13 +39,17 @@ Load Data Line
             CONTINUE
         END
 
-        ${row_dict}=        Create Dictionary
         FOR    ${index}    ${header}    IN ENUMERATE    @{header_row}
             Set To Dictionary    ${row_dict}    ${header}    ${row}[${index}]
         END
-        Append To List      ${rows}    ${row_dict}
+        BREAK
     END
 
     Close All Excel Documents
-    
-    RETURN              ${rows}
+
+    FOR    ${key_value_tuple}    IN    &{row_dict}
+    #Set every column name    "${${key_value_tuple}[0]}" as a separate Suite variable with the corresponding row value "${key_value_tuple}[1]"
+        IF    '${key_value_tuple}[1]' != ''
+            Set Suite Variable          ${${key_value_tuple}[0]}    ${key_value_tuple}[1]
+        END
+    END
