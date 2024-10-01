@@ -6,6 +6,13 @@ Test Teardown           Close All Excel Documents
 Suite Setup             Setup Browser
 Suite Teardown          End Suite
 
+
+*** Variables ***
+${webshop}              https://qentinelqi.github.io/shop/
+${excel_worksheet}      ${CURDIR}/../data/products_worksheet.xlsx
+${git_branch}           main
+
+
 *** Test Cases ***
 Verify Products
     [Documentation]     Read product names from excel sheet and verify that those can be found from a webshop page
