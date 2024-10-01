@@ -45,4 +45,6 @@ Load Data Line
         Append To List      ${rows}    ${row_dict}
     END
 
+    Close All Excel Documents
+    
     RETURN              ${rows}
