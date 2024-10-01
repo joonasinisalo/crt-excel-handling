@@ -9,7 +9,7 @@ Suite Teardown          End Suite
 
 *** Variables ***
 ${webshop}              https://qentinelqi.github.io/shop/
-${excel_worksheet}      ${CURDIR}/../data/products_worksheet.xlsx
+${excel_worksheet}      ${CURDIR}/../files/products_worksheet.xlsx
 ${git_branch}           main
 
 
