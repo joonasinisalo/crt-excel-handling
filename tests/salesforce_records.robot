@@ -16,7 +16,7 @@ Read Excel Data 1
 
     ${file}=            Set Variable    ${CURDIR}/../files/salesforce_test_data.xlsx
     ${sheet_name}=      Set Variable    Accounts
-    ${testname}=        Set Variable    Communications
+    ${testname}=        Set Variable    Consulting
 
     # Open existing workbook
     ${document}=        Open Excel Document    ${file}    excel
@@ -24,7 +24,7 @@ Read Excel Data 1
 
     ${header_row}=	    Read Excel Row	    row_num=1    sheet_name=${sheet_name}
 
-    @{rows}=            Create List
+    ${row_dict}=        Create Dictionary
     ${row_num}=         Set Variable    ${2}
 
     WHILE    True    limit=20
@@ -48,17 +48,24 @@ Read Excel Data 1
             CONTINUE
         END
 
-        ${row_dict}=        Create Dictionary
         FOR    ${index}    ${header}    IN ENUMERATE    @{header_row}
             Set To Dictionary    ${row_dict}    ${header}    ${row}[${index}]
         END
-        Append To List      ${rows}    ${row_dict}
+        BREAK
     END
 
     Close All Excel Documents
 
-    Log To Console      ${rows}
-    Set Suite Variable  ${rows}
+    Log To Console      ${row_dict}
+    Set Suite Variable  ${row_dict}
+
+    FOR    ${key_value_tuple}    IN    &{row_dict}
+    #Set every column name    "${${key_value_tuple}[0]}" as a separate Suite variable with the corresponding row value "${key_value_tuple}[1]"
+        IF    '${key_value_tuple}[1]' != ''
+            Set Suite Variable          ${${key_value_tuple}[0]}    ${key_value_tuple}[1]
+        END
+    END
+
 
 Read Excel Data 2
     [Tags]              excel    data    salesforce
@@ -69,7 +76,13 @@ Read Excel Data 2
     ${sheet_name}=      Set Variable    Accounts
     ${testname}=        Set Variable    Communications
 
-    @{excel_rows}=      Load Data Line    ${file}    ${sheet_name}    ${testname}
+    Load Data Line      ${file}    ${sheet_name}    ${testname}
 
-    Log To Console      ${excel_rows}
-    Set Suite Variable  ${excel_rows}
+    Log To Console      ${account_name}
+    Log To Console      ${phone}
+    Log To Console      ${fax}
+    Log To Console      ${website}
+    Log To Console      ${type}
+    Log To Console      ${industry}
+    Log To Console      ${employees}
+    Log To Console      ${annual_revenue}
