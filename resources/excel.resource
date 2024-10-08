@@ -25,7 +25,6 @@ Read Excel Row to Variables
     # Set the limit to what you think is the max amount of rows
     WHILE    True    limit=200
         ${row}=	            Read Excel Row	    row_num=${row_num}    sheet_name=${sheet_name_arg}
-        Log To Console      ${row}
 
         # Break from loop when row is empty, we have reached the end of the sheet
         IF    "${row}[0]" == "None"
@@ -34,7 +33,6 @@ Read Excel Row to Variables
         END
 
         ${row_num}=         Evaluate    ${row_num} + 1
-        Log To Console      ${row_num}
 
         ${status}=         Run Keyword And Return Status
         ...                Should Contain Match    ${row}    ${row_identifier_arg}
@@ -76,7 +74,6 @@ Read Excel Data
     # Set the limit to what you think is the max amount of rows
     WHILE    True    limit=200
         ${row}=	            Read Excel Row	    row_num=${row_num}    sheet_name=${sheet_name_arg}
-        Log To Console      ${row}
 
         # Break from loop when row is empty, we have reached the end of the sheet
         IF    "${row}[0]" == "None"
@@ -85,7 +82,6 @@ Read Excel Data
         END
 
         ${row_num}=         Evaluate    ${row_num} + 1
-        Log To Console      ${row_num}
 
         &{row_dict}=        Create Dictionary
         FOR    ${index}    ${header}    IN ENUMERATE    @{header_row}
