@@ -5,79 +5,62 @@ Test Teardown           Close All Excel Documents
 Suite Setup             Setup Browser
 Suite Teardown          End Suite
 
+
 *** Test Cases ***
-Read Excel Data 1
-    [Documentation]     Read Salesfoce record data from excel from multiple sheets.
-    ...                 ExcelLibrary keyword documentation:
-    ...                 https://rawgit.com/peterservice-rnd/robotframework-excellib/master/docs/ExcelLibrary.html
-    [Tags]              excel    data    salesforce
+Create Accounts from Excel Data
+    [Documentation]     Read Salesfoce record data from excel and create accounts.
+    [Tags]              excel    data    salesforce    account    create
     Login
-    SetConfig           DefaultTimeout    10
 
     ${file}=            Set Variable    ${CURDIR}/../files/salesforce_test_data.xlsx
     ${sheet_name}=      Set Variable    Accounts
-    ${testname}=        Set Variable    Consulting
 
-    # Open existing workbook
-    ${document}=        Open Excel Document    ${file}    excel
-    Log To Console      ${document}
+    # Use Read Excel Data from excel.resource file to read all rows to a list of dictionaries
+    @{accounts_list}=   Read Excel Data      ${file}    ${sheet_name}
 
-    ${header_row}=	    Read Excel Row	    row_num=1    sheet_name=${sheet_name}
+    @{account_links}=   Create List
 
-    ${row_dict}=        Create Dictionary
-    ${row_num}=         Set Variable    ${2}
+    FOR    ${account}    IN    @{accounts_list}
+        ClickItem           Accounts    tag=a    delay=2
+        VerifyText          Recently Viewed    anchor=Accounts
 
-    WHILE    True    limit=20
-        ${row}=	            Read Excel Row	    row_num=${row_num}    sheet_name=${sheet_name}
-        Log To Console      ${row}
+        ClickUntil          Account Information    New    anchor=Import
+        UseModal            On
 
-        # Break from loop when row is empty, we have reached the end of the sheet
-        IF    "${row}[0]" == "None"
-            Log To Console      Empty row
-            BREAK
-        END
+        TypeText            *Account Name    ${account}[account_name]    delay=1
+        TypeText            Phone    ${account}[phone]    anchor=Fax    delay=1
+        TypeText            Fax    ${account}[fax]    anchor=Phone    delay=1
+        TypeText            Website    ${accounts}[0][website]    delay=1
 
-        ${row_num}=         Evaluate    ${row_num} + 1
-        Log To Console      ${row_num}
+        PickList            Type    ${account}[type]
+        PickList            Industry    ${account}[industry]
+        TypeText            Employees    ${account}[employees]    delay=1
+        TypeText            Annual Revenue    ${account}[annual_revenue]    delay=1
 
-        ${status}=         Run Keyword And Return Status
-        ...                Should Contain Match    ${row}    ${testname}
+        ClickText           Save    partial_match=False    delay=1
+        UseModal            Off
+        VerifyText          was created.    timeout=45
 
-        # Continue to next row if match not found
-        IF    ${status} != ${True}
-            CONTINUE
-        END
+        VerifyText          ${account}[account_name]    anchor=Account
 
-        FOR    ${index}    ${header}    IN ENUMERATE    @{header_row}
-            Set To Dictionary    ${row_dict}    ${header}    ${row}[${index}]
-        END
-        BREAK
+        ${account_url}=     GetUrl
+        Append To List      ${account_links}    ${account_url}
     END
+    
+    Set Suite Variable  ${account_links}
 
-    Close All Excel Documents
-
-    Log To Console      ${row_dict}
-    Set Suite Variable  ${row_dict}
-
-    FOR    ${key_value_tuple}    IN    &{row_dict}
-    #Set every column name    "${${key_value_tuple}[0]}" as a separate Suite variable with the corresponding row value "${key_value_tuple}[1]"
-        IF    '${key_value_tuple}[1]' != ''
-            Set Suite Variable          ${${key_value_tuple}[0]}    ${key_value_tuple}[1]
-        END
-    END
-
-
-Read Excel Data 2
-    [Tags]              excel    data    salesforce
-    Login
-    SetConfig           DefaultTimeout    10
+Update Account
+    [Documentation]     Read Salesfoce record data from excel and update an existing account.
+    [Tags]              excel    data    salesforce    account    update
 
     ${file}=            Set Variable    ${CURDIR}/../files/salesforce_test_data.xlsx
     ${sheet_name}=      Set Variable    Accounts
-    ${testname}=        Set Variable    Communications
+    ${identifier}=      Set Variable    Partner, Inc.
 
-    Load Data Line      ${file}    ${sheet_name}    ${testname}
+    # Use Read Excel Row to Variables from excel.resource file to create suite variables from row values
+    Read Excel Row to Variables    ${file}    ${sheet_name}    ${identifier}
 
+    # Check that the newly created variables exist
     Log To Console      ${account_name}
     Log To Console      ${phone}
     Log To Console      ${fax}
@@ -86,3 +69,37 @@ Read Excel Data 2
     Log To Console      ${industry}
     Log To Console      ${employees}
     Log To Console      ${annual_revenue}
+
+    ClickItem           Accounts    tag=a    delay=2
+    ClickText           Search...    delay=1
+    TypeText            Search Accounts and more    ${account_name}    delay=1
+    ClickItem           ${account_name}    tag=span    delay=2
+
+    VerifyText          ${account_name}    anchor=Account
+    ClickUntil          Edit ${account_name}    Edit    anchor=Change Owner
+    UseModal            On
+
+    ${new_phone}=       Set Variable    (123) 555-1234
+    TypeText            Phone    ${new_phone}    anchor=Fax
+
+    ClickText           Save    partial_match=False    delay=1
+    UseModal            Off
+    VerifyText          was saved.    timeout=45
+
+    ClickText           Details
+    VerifyField         Account Name    ${account_name}
+    VerifyField         Phone    ${new_phone}
+    VerifyField         Website    ${website}
+
+    ClickItem           Accounts    tag=a    delay=2
+    VerifyText          Recently Viewed
+
+Delete Created Accounts
+    [Tags]              excel    data    salesforce    account    delete
+    FOR    ${account_url}    IN    @{account_links}
+        GoTo                ${account_url}
+        ClickItem           Delete    tag=button    delay=1
+        VerifyText          Are you sure you want to delete this account?
+        ClickText           Delete    anchor=Cancel
+        VerifyText          was deleted.
+    END
