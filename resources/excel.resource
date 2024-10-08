@@ -4,6 +4,10 @@ Library                 String
 Library                 Collections
 Library                 ExcelLibrary
 
+# ExcelLibrary keyword documentation:
+# https://rawgit.com/peterservice-rnd/robotframework-excellib/master/docs/ExcelLibrary.html
+
+
 *** Keywords ***
 Read Excel Row to Variables
     [Documentation]     Finds a row from an excel that matches the identifier and creates suite variables
