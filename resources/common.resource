@@ -1,14 +1,11 @@
 *** Settings ***
-Library                 QWeb
-Library                 ExcelLibrary
+Library                 QForce
 Library                 String
-Library                 ../libraries/GitOperations.py
+
 
 *** Variables ***
 ${BROWSER}              chrome
-${webshop}              https://qentinelqi.github.io/shop/
-${excel_worksheet}      ${CURDIR}/../data/products_worksheet.xlsx
-${git_branch}           main
+
 
 *** Keywords ***
 Setup Browser
@@ -17,3 +14,10 @@ Setup Browser
 
 End Suite
     Close All Browsers
+
+Login
+    [Arguments]           ${sf_instance_url}=${login_url}    ${sf_username}=${username}   ${sf_password}=${password}  
+    GoTo                  ${sf_instance_url}
+    TypeText              Username    ${sf_username}    delay=1
+    TypeSecret            Password    ${sf_password}
+    ClickText             Log In

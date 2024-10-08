@@ -1,8 +1,17 @@
 *** Settings ***
 Resource                ../resources/common.resource
+Library                 ExcelLibrary
+Library                 ../libraries/GitOperations.py
 Test Teardown           Close All Excel Documents
 Suite Setup             Setup Browser
 Suite Teardown          End Suite
+
+
+*** Variables ***
+${webshop}              https://qentinelqi.github.io/shop/
+${excel_worksheet}      ${CURDIR}/../files/products_worksheet.xlsx
+${git_branch}           main
+
 
 *** Test Cases ***
 Verify Products
